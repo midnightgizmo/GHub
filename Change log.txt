@@ -1,0 +1,209 @@
+-- 0.51 -- 14/11/2020
+
+* upgraded project to visual studio 2019
+
+-- 0.05
+
+* Moved over to .net verion 2
+* Change the GUI for accessing the plugins.  Loaded plugins will now be shown under the Plugins section of the treeview menu on the left hand side.  clicking on each plugin will bring up the corrisponding GUI to that plugin (assuming a GUI was created for that plugin).
+
+
+-- 0.044 -- 27/6/2005 --
+
+* Fixed a bug for when trying to resolve a DNS address to an ip address for multihub connection.
+* Fixed a Connection to hub bug where a user could not always get in.
+* Fixed error where if a hub disconnects with out sending a $Exit command.
+* Added to do deal $Badpass between server to server.
+* Changed the state a multi-hub can be in from true or false to 0, 1 or 2. 0 = not logged in. 1 = logging in. 2 = logged in.
+* Set the time out on send/receive sockets to 10 seconds (may lower this in later versions).
+
+
+-- 0.043 -- 25/6/2005 --
+
+* Fixed lock up bug when a server tried to disconnect from another server.
+* Fixed error where when a Server attempted to leave a multi-hub. Not all the users got removed from users list.
+* Fixed an error where if connection to a client dies the rest of the users in the hub were not informed, leaving a ghost user.
+* Fixed error when in multi hub mode.  If a user reconnected with the same nick to the same hub it would disconnect the hub from the multi hubs.
+* Added 2 events that the GUI can pick up on (when a server connects to another server and when a server disconnects from a server).  This has meant the Multi Hubs user interface now shows whether they are connected to a hub or not (before it did not).
+* Fixed a major memory leek.
+* Added the clean up of memory using the Garbage collection every 5 minutes.
+
+
+
+-- 0.0421 -- 23/6/2005 -- W A R N I N G  - I strongly recommend you run this in debug mode.
+
+* Fixed 2 stupid errors where i forgot to add the | to the end off them.
+
+
+-- 0.042 -- 23/6/2005 -- W A R N I N G  - I strongly recommend you run this in debug mode.
+
+"$NewUser IsOP=" + this.isOP.ToString() + " " + this.rawUserInfo + "|";
+
+* Changed the protocal that is used to connect to another server. it is now as follows.
+
+	c > S	connection made
+	S > C	"$Lock . . .|"
+	C > S	"$LogginIn <username> <pass>|"
+
+	S > C 	"$Badpass|"
+	OR
+	S > C	"$AllUsersInfo|"
+	S > C	"$NewUser IsOP=<True/False> $MyINFO $ALL <nick> <interest>$ $<speed>$<e-mail>$<sharesize>$|"
+	S > C 	"$OpList . . |" 
+	S > C	"$loggedIn|"
+
+	C > S	"$NewUser IsOP=<True/False> $MyINFO $ALL <nick> <interest>$ $<speed>$<e-mail>$<sharesize>$|"
+	C > S 	"$OpList . . |"
+	C > S	"$loggedIn|"
+
+* Fixed loads of errors that i can't think off top of my head, this should make multi-hubing more or less now work with just the odd error that I have missed.  NOTE. Disconnecting may still prove a problem so be careful.  I have had times when the server that is disconnecting will lock up (not sure why yet).  Also when the server that is disconnecting does not freeze it some times seems to show users from the other hub still logged into this one (not sure yet as why. If you do experience these problems please let me know).
+
+
+-- 0.041 -- 22/6/2005 -- W A R N I N G  - I strongly recommend you run this in debug mode.
+
+* Added basic protocol for the logging in of server to server for multi hubbing.  The logging in is as follows.
+
+	c > S	connection made
+	S > C	"$Lock . . .|"
+	C > S	"$LogginIn <username> <pass>|"
+
+	S > C 	"$Badpass|"
+	OR
+	S > C	"$AllUsersInfo|"
+	S > C	"$MyINFO . . . "
+	S > C 	"$OpList . . |" 
+	S > C	"$loggedIn|"
+
+	C > S	"$MyINFO . . .|"
+	C > S 	"$OpList . . |"
+	C > S	"$loggedIn|"
+
+* 2 or more hubs can now connect together to form a multi hub.
+* A hub can disconnect from another hub (this is not yet fully working and you should not assume the socket will be closed).
+* Main chat works across multi hubs.
+* A user will be denied access to the hub if that hub is connected to other hubs and one of them has the same nick
+* Added to the MultiHubs xml.  The xml file will now hold a name for each of the hubs to connect to (Delete current MultiHubs xml file so that an up to date one can be created. If you do not do this the hub may at current crash).
+* When a new user enters in multi hub mode all other hubs will be informed of this new user and each server will them tell its clients of the arrival of a new user.
+* When a user leaves a hub while running in multi hub mode each hub will be told of the user leaving and then each hub will let all its users know the user has left.
+* Added a Multi Hub User Interface.  Shows all hubs that were added to the mulithubs xml file in a list.
+* Using the Multi Hub User Interface the server can connect to other hubs. 
+WARNING.  At the moment this is very temperamental and although it will work it has to be done correctly otherwise it will not work.  A lot more error checking will be added in later releases and at the moment you should not expect it to work all the time.
+* If 2 hubs decide to connect to each other while they currently have users in each of them, they may both contain the same user.  If the servers detected this they will disconnect from each other - a friendly message needs adding for when this happens to let the user know what’s going on.
+
+
+
+-- 0.040 -- 20/6/2005 --
+
+* Added ability to use the default kick to disconnect a user from the hub.
+* Added ability to minimise to try (the icon is a bit rubbish for it though).
+* Added more code to the ClientWorkOutMessage.cs class, getting it ready for a server to connect to it.
+* Added MultiHubs.xml file which will hold a hubs address, username and password that this server wishes to connect (do not use this file yet as it will not do anything).
+* Fixed error where a user could connect with a space in there name.
+* Fixed error where Profiles.xml could not contain certain characters (added encoding="Windows-1252" - this does mean though that any ' must be replaced with &#39; in the xml file. This will not be to much of a concern when profiles and accounts can be added through hub software as it will do the converting for you )- Thx HaArD
+* Fixed a spelling error when a user connects with too long a nick. - Thx HaArD
+* Fixed bug where a user could send another nick other than there own when sending a pm - Thx Richey589
+* Added to the GHub.Settings.Hub.hubSettings class 3 static variables.
+	- NickLength, the length a nick can be that connects to the hub. Default set at 20
+	- MaxMessageLength, the maximum message length a client can send before the "|" is hit.
+	- MaxMainChatLength, maximum length a main chat message can be. Note must be lower than the MaxMessageLength or it will not work.
+* Added a Settings page to the hub which allows the above 3 settings to be changed (do not currently get saved when hub closes).
+
+
+
+-- 0.035 -- 19/6/2005 --
+
+* Fixed error where user could change there nick to what ever they liked after logging in.
+* Fixed error where a user could pretend to be some one else when doing a search in either active or passive.
+* Fixed error where user could talk in chat with out there nick
+
+
+-- 0.034 -- 19/6/2005 --
+
+* A temporally error log has been introduced to try and catch any errors that may occur during hosting.
+* Fixed bug where unusual names in the account xml would cause the program to crash on load up.
+
+-- 0.033 -- 17/6/2005 --
+
+* Added ability for active users to be able to get file lists off other users to local server (ConnectToMe).
+* Added ability for passive users to get file lists off active users on the same server (RevConnectToMe)
+* Fixed minor problem where the hub did not print some text to ask the user for a password - Thx Inflictor
+* Fixed minor problem where the hub did not print some text telling the user they supplied incorrect password.
+* Hopefully, Fixed the locking up bug now. Figures crossed.
+* Changed the Synchronisation around a bit with the mutexes.  This should mean each thread does not have to wait so long for a mutex to become free.
+* Added a default profile which all none reged users will be associated with (delete your xml files for this to take affect).
+* Added ability to have on join message (bit of a hack at the moment, will clean the code up later)
+
+
+
+-- 0.032 -- 17/6/2005 --
+
+* Fixed problem where when the hub is stopped and restarted the user list that a user was sent was not cleared from the previous time it was up.
+* Fixed problem when a reg users sends incorrect password. Thx Inflictor
+* Fixed problem where a client socket forcefully closes causing the hub to lock up - Thx Rahxie and Inflictor
+
+
+-- 0.031 -- 16/6/2005 --
+
+* Fixed bug when a user exits.  The myINFO array that gets sent to people when they enter was not getting updated. This ment it send the myINFO string of people also not logged into the hub
+
+-- 0.03 -- 16/6/2005 --
+
+* Added a very simple front end to the server.  Using this GUI a user can start and stop the server, decide what port they want to listen on.  There is also a screen to show what plug-ins has been loaded into the server (this screen needs a lot more work to it though).
+
+* Made it so that if a user tries to exit the program while the server is running they will get a dialog box asking them are they sure they wish to exit.
+
+* Added simple error checking to the text box which holds the port number to connect to.  A message box will also be displayed if the server tries to connect to a port that is already in use.
+
+* Changed the way all the MyINFO strings are put together for when a new user logs in and they are sent to them.  Before they were recalculated every time a request was made for them.  They are now only recalculated when ever a myINFO string changes.  To do this some new static functions have been added to the Client class.
+
+
+
+
+-- 0.02-- 15/6/2005 --
+
+* Added code to the usersAccount, accounts, profiles and profile classes.  These classes will be used to gain access to a users profile, determine if the user is a reged user and if they are an OP.  The usersAccount and profiles classes will now save and load the data to an XML file.
+
+* Continued with code for the logon process.  An OP can now log onto the server and any other user will see them as an op.
+
+* Taken out the ability for old clients to connect to the server.  If a user does not send a $Supports command they will not be allowed access to the hub.  Also if a user sends a $Supports command but does not support NoGetINFO and NoHello, the user will not be granted access to the hub.  This allows for a much easier login process and also cuts down on traffic between the server and the client.  This will not affect latest dc++ client although I am not sure how it will affect the normal direct connect client version 2 (at a guess it will not work).
+
+* Fixed a problem where a user would send weird symbols to the hub and would not be displayed correctly.
+
+* Fixed a problem where the user may close the socket just before the server tries to send data making the server crash.
+
+
+
+-- 0.01-- 12/6/2005 --
+
+* Every class that existed on the UML diagram has now been created in code.  This will give a shell to the program allowing code to be added to each class as necessary.
+
+* Work is being done on the User side of the code first, starting off from the client class (the base class for which both a user and a server will inherit) and working the way up the inheritance tree.
+
+* Basic logging in has been done to allow a normal user to enter and leave the hub (this is not yet complete)
+
+* The ability to chat in main and in Private Message to some one has been added.
+
+* Plug-in support has been added for the client side.  The plug-ins get called when an event is occurred.  The following events have been implemented but not yet tested.
+
+	- ValidateNick
+	- Key
+	- myInfo
+	- AlmostLoggedIn
+	- Version
+	- GetNickList
+	- UserLeft
+	- PrivateMessage
+
+* Added the ability for a plug-in to let the core know whether it wants to handle the message or let the core handle it (each method called in a plug-in must return true or false. True indicates the plug in has handed it, false indicates it has not and the server will try to handle the message).
+
+* Added code to the GHub class to allow the server to listen for connections, accept, check to see if data is available and act upon that data.
+
+
+
+-- Initial design stage-- 7/6/2005 --
+
+* It has been about a week and the UML diagram for the hub is now at a point where coding can start to be done.  The diagram will be added to and changed to over the period of coding but the over all structure will stay the same.  The design has been made to work for an object orientated programming language as it heavily uses inheritance.  The code will be done in one of Microsoft’s programming languages called c#.
+
+
+
+

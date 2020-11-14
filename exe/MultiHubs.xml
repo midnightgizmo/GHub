@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<MultiHubs>
+  <Hub>
+    <Address>gizmos.no-ip.com</Address>
+    <Port>411</Port>
+    <Pass>temp</Pass>
+    <UserName>Gizmo</UserName>
+    <HubName>a hub name</HubName>
+  </Hub>
+</MultiHubs>

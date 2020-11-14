@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Profiles>
+  <Profile>
+    <isOperator>False</isOperator>
+    <OnJoinMessage>
+
+Welcome to GHub</OnJoinMessage>
+    <ProfileLevel>0</ProfileLevel>
+    <ProfileName>DefaultProfile</ProfileName>
+  </Profile>
+</Profiles>
